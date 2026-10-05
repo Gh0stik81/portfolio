@@ -1,0 +1,54 @@
+---
+import { languages } from '../../i18n/ui';
+import { localizedPath, useTranslations, type Lang } from '../../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const langs = Object.keys(languages) as Lang[];
+---
+
+<nav class="lang-switch" aria-label={t('nav.switchLang')}>
+  {
+    langs.map((l) => (
+      <a
+        href={localizedPath(l)}
+        hreflang={l}
+        lang={l}
+        aria-current={l === lang ? 'page' : undefined}
+        title={languages[l]}
+      >
+        {l.toUpperCase()}
+      </a>
+    ))
+  }
+</nav>
+
+<style>
+  .lang-switch {
+    display: flex;
+    gap: var(--space-1);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  a {
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--color-text-muted);
+    transition: color var(--transition), background var(--transition);
+  }
+
+  a:hover {
+    color: var(--color-text);
+  }
+
+  a[aria-current='page'] {
+    color: var(--color-bg);
+    background: var(--color-accent);
+  }
+</style>

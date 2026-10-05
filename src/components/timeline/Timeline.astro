@@ -1,0 +1,161 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Clip from './Clip.astro';
+import { useTranslations, type Lang } from '../../i18n/utils';
+
+interface Props {
+  works: CollectionEntry<'works'>[];
+  lang: Lang;
+}
+
+const { works, lang } = Astro.props;
+const t = useTranslations(lang);
+
+const SPAN = { s: 1, m: 2, l: 3 } as const;
+const tracks = [
+  { type: 'code', label: t('track.code') },
+  { type: 'graphic', label: t('track.graphic') },
+  { type: 'video', label: t('track.video') },
+] as const;
+
+// Práce idú za sebou ako strihy na osi: každá začína tam, kde predošlá skončila.
+let cursor = 1;
+const placed = works.map((work) => {
+  const span = SPAN[work.data.size];
+  const item = { work, start: cursor, span };
+  cursor += span;
+  return item;
+});
+const total = Math.max(cursor - 1, 1);
+
+const timecode = (i: number) => `00:00:${String(i * 5).padStart(2, '0')}:00`;
+---
+
+<section class="timeline" aria-label={t('timeline.label')} style={`--units: ${total};`}>
+  <div class="ruler" aria-hidden="true">
+    <span class="track-label"></span>
+    <div class="lane">
+      {Array.from({ length: total }, (_, i) => <span class="tick">{timecode(i)}</span>)}
+    </div>
+  </div>
+
+  {
+    tracks.map((track) => (
+      <div class="track" data-type={track.type}>
+        <span class="track-label">{track.label}</span>
+        <div class="lane">
+          {placed
+            .filter((p) => p.work.data.type === track.type)
+            .map((p) => (
+              <Clip work={p.work} lang={lang} start={p.start} span={p.span} />
+            ))}
+        </div>
+      </div>
+    ))
+  }
+
+  <span class="playhead" aria-hidden="true"></span>
+</section>
+
+<style>
+  .timeline {
+    --label-w: 6rem;
+    position: relative;
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .ruler,
+  .track {
+    display: grid;
+    grid-template-columns: var(--label-w) 1fr;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+
+  .lane {
+    display: grid;
+    grid-template-columns: repeat(var(--units), minmax(0, 1fr));
+    gap: var(--space-1);
+  }
+
+  .track .lane {
+    min-height: 3rem;
+    padding: var(--space-1);
+    background: var(--color-surface-2);
+    border-radius: var(--radius-sm);
+  }
+
+  .track-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .track .track-label::before {
+    content: '';
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 2px;
+    background: var(--type-color);
+  }
+
+  .tick {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    border-left: 1px solid var(--color-border);
+    padding-left: var(--space-1);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .playhead {
+    position: absolute;
+    top: var(--space-2);
+    bottom: var(--space-2);
+    left: calc(var(--space-4) + var(--label-w) + var(--space-2));
+    width: 2px;
+    background: var(--color-accent);
+    pointer-events: none;
+    animation: sweep 6s ease-in-out 0.5s both;
+  }
+
+  @keyframes sweep {
+    to {
+      left: calc(100% - var(--space-4));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .playhead {
+      animation: none;
+    }
+  }
+
+  /* Mobil: os sa mení na vertikálny zoznam po stopách. */
+  @media (max-width: 40rem) {
+    .ruler,
+    .playhead {
+      display: none;
+    }
+
+    .track {
+      grid-template-columns: 1fr;
+    }
+
+    .track .lane {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      min-height: 0;
+    }
+  }
+</style>

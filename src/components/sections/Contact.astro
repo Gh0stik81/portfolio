@@ -1,0 +1,70 @@
+---
+import { useTranslations, type Lang } from '../../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+// Placeholder kontakty, doplniť skutočné.
+const contacts = [
+  { label: 'E-mail', value: 'roland.moravcik01@gmail.com', href: 'mailto:roland.moravcik01@gmail.com' },
+  { label: 'GitHub', value: 'Gh0stik81', href: 'https://github.com/Gh0stik81' },
+  { label: 'LinkedIn', value: 'placeholder', href: 'https://www.linkedin.com/' },
+];
+---
+
+<section id="contact" class="section">
+  <div class="container">
+    <h2 class="section-title">{t('contact.title')}</h2>
+    <p class="lead">{t('contact.text')}</p>
+    <ul class="contacts">
+      {
+        contacts.map((c) => (
+          <li>
+            <span class="label">{c.label}</span>
+            <a
+              href={c.href}
+              {...(c.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
+              {c.value}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .lead {
+    margin-top: 0;
+    color: var(--color-text-muted);
+  }
+
+  .contacts {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    gap: var(--space-4);
+  }
+
+  .label {
+    width: 6rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  a {
+    color: var(--color-accent);
+  }
+</style>

@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+import { languages } from '../i18n/ui';
+import { absoluteLocalizedUrl, withBase, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  /** Pre 404 a podobné stránky bez jazykových alternatív. */
+  noAlternates?: boolean;
+}
+
+const { lang, title, description, noAlternates = false } = Astro.props;
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+const langs = Object.keys(languages) as Lang[];
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+    {canonical && !noAlternates && <link rel="canonical" href={canonical} />}
+    {
+      !noAlternates &&
+        langs.map((l) => <link rel="alternate" hreflang={l} href={absoluteLocalizedUrl(l)} />)
+    }
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={lang === 'sk' ? 'sk_SK' : 'en_US'} />
+    {canonical && !noAlternates && <meta property="og:url" content={canonical} />}
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

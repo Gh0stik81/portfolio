@@ -1,0 +1,100 @@
+---
+import { useTranslations, type Lang } from '../../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+// Placeholder zoznam, doplniť skutočné technológie.
+const skills = ['React', 'TypeScript', 'Astro', '.NET', 'Git', 'Figma'];
+---
+
+<section id="about" class="section">
+  <div class="container about">
+    <h2 class="section-title">{t('about.title')}</h2>
+    <div class="photo" aria-hidden="true">Foto</div>
+    <div class="text">
+      <p>{t('about.text')}</p>
+      <h3>{t('about.skills')}</h3>
+      <ul class="skills">
+        {skills.map((skill) => <li>{skill}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    display: grid;
+    grid-template-columns: 12rem 1fr;
+    grid-template-areas:
+      'title title'
+      'photo text';
+    gap: var(--space-8);
+  }
+
+  .section-title {
+    grid-area: title;
+    margin-bottom: 0;
+  }
+
+  .photo {
+    grid-area: photo;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border-radius: var(--radius);
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .text {
+    grid-area: text;
+    max-width: 40rem;
+  }
+
+  .text p {
+    margin-top: 0;
+  }
+
+  h3 {
+    font-size: var(--text-base);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-2);
+  }
+
+  .skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .skills li {
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: var(--text-sm);
+  }
+
+  @media (max-width: 40rem) {
+    .about {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        'title'
+        'photo'
+        'text';
+    }
+
+    .photo {
+      width: 8rem;
+    }
+  }
+</style>

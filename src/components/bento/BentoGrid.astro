@@ -1,0 +1,74 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import WorkCard from './WorkCard.astro';
+import { useTranslations, type Lang } from '../../i18n/utils';
+
+interface Props {
+  works: CollectionEntry<'works'>[];
+  lang: Lang;
+}
+
+const { works, lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<div class="bento" data-bento>
+  {works.map((work) => <WorkCard work={work} lang={lang} />)}
+</div>
+<p class="empty" data-bento-empty hidden>{t('works.empty')}</p>
+
+<script>
+  import { initFilter } from '../../scripts/filter';
+  initFilter();
+</script>
+
+<style>
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-flow: dense;
+    gap: var(--space-4);
+  }
+
+  .bento > :global([data-size='s']) {
+    grid-column: span 1;
+  }
+
+  .bento > :global([data-size='m']) {
+    grid-column: span 2;
+  }
+
+  .bento > :global([data-size='l']) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  @media (max-width: 56rem) {
+    .bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bento > :global([data-size='s']),
+    .bento > :global([data-size='m']) {
+      grid-column: span 1;
+    }
+
+    .bento > :global([data-size='l']) {
+      grid-row: span 1;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .bento {
+      grid-template-columns: 1fr;
+    }
+
+    .bento > :global([data-size='l']) {
+      grid-column: span 1;
+    }
+  }
+
+  .empty {
+    color: var(--color-text-muted);
+  }
+</style>

@@ -1,0 +1,187 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import VideoEmbed from '../media/VideoEmbed.astro';
+import { useTranslations, type Lang } from '../../i18n/utils';
+
+interface Props {
+  work: CollectionEntry<'works'>;
+  lang: Lang;
+}
+
+const { work, lang } = Astro.props;
+const t = useTranslations(lang);
+const { type, title, summary, year, size, tech, cover, coverAlt, links, video } = work.data;
+const typeLabel = { code: t('track.code'), graphic: t('track.graphic'), video: t('track.video') }[type];
+---
+
+<article class="card" id={`work-${work.id}`} data-work data-type={type} data-size={size}>
+  <div class="media">
+    {
+      video ? (
+        <VideoEmbed
+          provider={video.provider}
+          id={video.id}
+          title={title[lang]}
+          playLabel={t('card.play')}
+          cover={cover}
+        />
+      ) : cover ? (
+        <Image
+          src={cover}
+          alt={coverAlt?.[lang] ?? ''}
+          widths={[400, 800, 1200]}
+          sizes="(max-width: 40rem) 100vw, 50vw"
+        />
+      ) : (
+        <div class="placeholder" aria-hidden="true">
+          {typeLabel}
+        </div>
+      )
+    }
+  </div>
+
+  <div class="body">
+    <p class="meta">
+      <span class="badge">{typeLabel}</span>
+      <span>{year}</span>
+    </p>
+    <h3>{title[lang]}</h3>
+    <p class="summary">{summary[lang]}</p>
+
+    {
+      tech.length > 0 && (
+        <ul class="tech">
+          {tech.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      )
+    }
+
+    {
+      (links.repo || links.demo) && (
+        <p class="links">
+          {links.repo && (
+            <a href={links.repo} target="_blank" rel="noopener noreferrer">
+              {t('card.repo')}
+            </a>
+          )}
+          {links.demo && (
+            <a href={links.demo} target="_blank" rel="noopener noreferrer">
+              {t('card.demo')}
+            </a>
+          )}
+        </p>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--type-color);
+    border-radius: var(--radius);
+    overflow: hidden;
+    scroll-margin-top: var(--space-16);
+  }
+
+  .card[hidden] {
+    display: none;
+  }
+
+  .card:target {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .media :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .placeholder {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 9;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--color-surface-2) 0 12px,
+      color-mix(in srgb, var(--type-color) 12%, var(--color-surface-2)) 12px 24px
+    );
+  }
+
+  .card[data-size='l'] .placeholder,
+  .card[data-size='l'] .media :global(img) {
+    aspect-ratio: 4 / 3;
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    flex: 1;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .badge {
+    color: var(--type-color);
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+  }
+
+  .summary {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tech li {
+    padding: 0 var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: 0.75rem;
+  }
+
+  .links {
+    display: flex;
+    gap: var(--space-4);
+    margin: auto 0 0;
+    padding-top: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .links a {
+    color: var(--color-accent);
+  }
+</style>

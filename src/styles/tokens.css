@@ -1,0 +1,43 @@
+/* Dizajnové tokeny. Placeholder hodnoty, vizuálny štýl ešte nie je rozhodnutý. */
+:root {
+  color-scheme: dark;
+
+  /* farby */
+  --color-bg: #121316;
+  --color-surface: #1b1d22;
+  --color-surface-2: #24272e;
+  --color-border: #32363f;
+  --color-text: #e8e9ec;
+  --color-text-muted: #9a9fab;
+  --color-accent: #f2b33d;
+
+  /* farby stôp na osi a typov prác */
+  --color-code: #4f8cff;
+  --color-graphic: #e2557a;
+  --color-video: #3fbf8f;
+
+  /* typografia */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'JetBrains Mono', Consolas, monospace;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-2xl: clamp(2rem, 5vw, 3.25rem);
+
+  /* medzery */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ostatné */
+  --radius: 10px;
+  --radius-sm: 6px;
+  --container: 72rem;
+  --transition: 150ms ease;
+}

@@ -1,0 +1,75 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from './layout/Header.astro';
+import Footer from './layout/Footer.astro';
+import Timeline from './timeline/Timeline.astro';
+import FilterBar from './bento/FilterBar.astro';
+import BentoGrid from './bento/BentoGrid.astro';
+import About from './sections/About.astro';
+import Contact from './sections/Contact.astro';
+import { useTranslations, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const works = (await getCollection('works', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<BaseLayout lang={lang} title={t('meta.title')} description={t('meta.description')}>
+  <Header lang={lang} />
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <p class="role">{t('hero.role')}</p>
+        <h1>{t('hero.name')}</h1>
+        <p class="tagline">{t('hero.tagline')}</p>
+        <Timeline works={works} lang={lang} />
+      </div>
+    </section>
+
+    <section id="works" class="section">
+      <div class="container">
+        <h2 class="section-title">{t('works.title')}</h2>
+        <FilterBar lang={lang} />
+        <BentoGrid works={works} lang={lang} />
+      </div>
+    </section>
+
+    <About lang={lang} />
+    <Contact lang={lang} />
+  </main>
+
+  <Footer lang={lang} />
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: var(--space-12) var(--space-8);
+  }
+
+  .role {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .tagline {
+    max-width: 40rem;
+    margin: var(--space-4) 0 var(--space-8);
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+  }
+</style>
